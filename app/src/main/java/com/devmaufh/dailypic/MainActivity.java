@@ -1,8 +1,11 @@
 package com.devmaufh.dailypic;
 
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.translate.Translate;
 import com.google.cloud.translate.TranslateOptions;
 import com.google.cloud.translate.Translation;
@@ -30,9 +34,11 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue queue;
     private String apodTitle,apodDescription,apodImageUrl;
     private String credential="AIzaSyDq3tTjY-znQIHnqF85R_X_JkOqPpqhrJY";
+    CardView cardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bindUI();
@@ -43,14 +49,19 @@ public class MainActivity extends AppCompatActivity {
         tvTitle.setText(apodTitle);
         tvDescription.setText(apodDescription);
         Picasso.with(getApplicationContext()).load(apodImageUrl).into(img);
+        cardView.setVisibility(View.VISIBLE);
 
     }
     private void bindUI(){
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
         tvTitle=(TextView)findViewById(R.id.tvTitle);
         tvDescription=(TextView)findViewById(R.id.tvDescription);
         img=(ImageView)findViewById(R.id.imgFondo);
         tvDescription.setMovementMethod(new ScrollingMovementMethod());
         queue= Volley.newRequestQueue(this);
+        cardView= (CardView)findViewById(R.id.card);
+
     }
     private void requestNASA(String url){
         JsonRequest request= new JsonObjectRequest(com.android.volley.Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -60,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
                     apodTitle=response.getString("title");
                     apodDescription=response.getString("explanation");
                     apodImageUrl=response.getString("hdurl");
-                    getTranslatedText(apodDescription);
-                    tvDescription.setText(getTranslatedText(apodDescription));
+                    //getTranslatedText(apodDescription);
+                    //tvDescription.setText(getTranslatedText(apodDescription));
                     setValues();
 
                 } catch (JSONException e) {
